@@ -1,0 +1,27 @@
+# Data (download from Kaggle; do not commit)
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# Secrets (API keys for Reddit / Adzuna)
+.env
+*.key
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+venv/
+
+# Models
+models/
+*.pkl
+*.joblib
+*.pt
+*.bin
+
+# OS
+.DS_Store
+Thumbs.db
