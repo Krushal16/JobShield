@@ -1,27 +1,42 @@
-# Data (download from Kaggle; do not commit)
+# ---- Data (download from Kaggle; never commit) ----
 data/raw/*
+data/interim/*
 data/processed/*
-!data/raw/.gitkeep
-!data/processed/.gitkeep
+data/external/*
+!data/*/.gitkeep
 
-# Secrets (API keys for Reddit / Adzuna)
-.env
-*.key
-
-# Python
-__pycache__/
-*.pyc
-.ipynb_checkpoints/
-.venv/
-venv/
-
-# Models
-models/
+# ---- Models (stored on Hugging Face Hub) ----
+models/checkpoints/*
+models/final/*
+!models/*/.gitkeep
 *.pkl
 *.joblib
 *.pt
 *.bin
+*.safetensors
 
-# OS
+# ---- Large or generated results ----
+results/predictions/*
+!results/predictions/.gitkeep
+
+# ---- Logs ----
+logs/*
+!logs/.gitkeep
+
+# ---- Secrets ----
+.env
+*.key
+
+# ---- Python / Jupyter ----
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.pytest_cache/
+.venv/
+venv/
+
+# ---- OS / editors ----
 .DS_Store
 Thumbs.db
+.vscode/
+.idea/

@@ -1,23 +1,31 @@
-# Week 1–2: data analysis
+# Data analysis (Weeks 1–2)
 pandas>=2.0
 numpy>=1.24
 matplotlib>=3.7
 seaborn>=0.12
 jupyter>=1.0
+pyyaml>=6.0
 
-# Weeks 3–5: classical models (install when needed)
+# Preprocessing, splitting, evaluation (Week 2)
 scikit-learn>=1.3
-xgboost>=2.0
-imbalanced-learn>=0.11
 nltk>=3.8
 
-# Weeks 6–8: transformer + explainability
+# Testing
+pytest>=8.0
+
+# Classical models (Weeks 3–5)
+xgboost>=2.0
+imbalanced-learn>=0.11
+joblib>=1.3
+
+# Transformer + explainability (Weeks 6–8) – uncomment when needed
 # torch>=2.1
 # transformers>=4.40
 # shap>=0.44
 # lime>=0.2
 
-# Weeks 9–10: app and live data
+# App and live data (Weeks 9–10) – uncomment when needed
 # streamlit>=1.35
 # praw>=7.7
 # requests>=2.31
+# python-dotenv>=1.0

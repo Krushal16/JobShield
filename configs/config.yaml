@@ -1,0 +1,42 @@
+# JobShield experiment configuration
+# Change values here, not inside the code, so every run is reproducible and comparable.
+
+project: JobShield
+seed: 42
+
+paths:
+  raw_data: data/raw/fake_job_postings.csv        # original Kaggle file – never edited
+  interim_data: data/interim/emscad_clean.csv     # after cleaning, before splitting
+  processed_dir: data/processed                   # train.csv / val.csv / test.csv
+  figures_dir: results/figures
+  metrics_file: results/metrics/results.csv       # one row per model run (leaderboard)
+  predictions_dir: results/predictions
+  models_dir: models/final
+
+data:
+  target: fraudulent
+  expected_rows: 17880
+  expected_fake: 866
+
+split:                     # stratified on the target, same fake share in every split
+  train: 0.70
+  val: 0.15
+  test: 0.15
+
+preprocessing:
+  lemmatize: true
+  drop_duplicates: true    # exact duplicate text + label removed BEFORE splitting (avoids leakage)
+
+eda:
+  min_group_size: 50       # minimum postings for a category to appear in fraud-rate charts
+
+# Week 3+ (baseline) – filled in when the experiment is run
+tfidf:
+  ngram_range: [1, 2]
+  min_df: 2
+  max_features: 50000
+
+logistic_regression:
+  class_weight: balanced
+  C: 1.0
+  max_iter: 1000
