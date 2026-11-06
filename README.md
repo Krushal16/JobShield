@@ -2,6 +2,7 @@
 
 **AML-3403 AI and ML Capstone · Group 5 · Fall 2026 · Lambton College**
 Faculty Supervisor: William Pourmajidi
+Repository: https://github.com/Krushal16/JobShield
 
 | Member | Student ID | Core responsibility |
 |---|---|---|
@@ -77,17 +78,19 @@ JobShield/
 ├── .env.example                # template for API keys (real keys go in .env, never committed)
 ├── .github/pull_request_template.md
 ├── configs/config.yaml         # paths, seed, split ratios, model parameters
-├── docs/                       # labelling guideline, 2026 test set template, GitHub workflow
+├── docs/                       # labelling guideline, 2026 template, GitHub workflow, red-flag feature design
 ├── notebooks/
 │   ├── 01_data_exploration.ipynb
-│   └── 02_preprocessing.ipynb
+│   ├── 02_preprocessing.ipynb
+│   ├── 03_baseline_model.ipynb
+│   └── 04_red_flags_xgboost.ipynb
 ├── src/
 │   ├── data/                   # loader.py (load + validate), split.py (stratified split)
-│   ├── features/               # text_cleaning.py (Week 2); red_flags.py (Week 4)
-│   ├── models/                 # model definitions (Weeks 3–6)
-│   ├── training/               # training and cross-validation scripts (Weeks 3–6)
-│   ├── evaluation/             # metrics.py (shared metrics, plots, results log)
-│   ├── inference/              # predict_posting() for the app (Week 3+)
+│   ├── features/               # text_cleaning.py (Week 2), red_flags.py (Week 4)
+│   ├── models/                 # baseline.py (TF-IDF + LR / Naive Bayes), xgb.py (TF-IDF + red flags + XGBoost)
+│   ├── training/               # train_baseline.py, tune_tfidf.py, train_xgb.py
+│   ├── evaluation/             # metrics.py (metrics, plots, results log), error_analysis.py
+│   ├── inference/              # predict.py – predict_posting(): risk score, red flags, key words
 │   └── utils/                  # config.py (config loading, paths, seeds)
 ├── data/
 │   ├── raw/                    # original Kaggle CSV (not in Git)
@@ -108,30 +111,40 @@ JobShield/
 ## 6. Installation
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/Krushal16/JobShield.git
 cd JobShield
 pip install -r requirements.txt
 ```
-Google Colab: `!git clone <repo-url>`, `%cd JobShield`, `!pip install -r requirements.txt`, then upload the CSV to `data/raw/`.
+Google Colab: `!git clone https://github.com/Krushal16/JobShield.git`, `%cd JobShield`, `!pip install -r requirements.txt`, then upload the CSV to `data/raw/`.
 
 ## 7. How to run
 
 1. Put `fake_job_postings.csv` in `data/raw/`.
 2. Run `notebooks/01_data_exploration.ipynb` → charts in `results/figures/`.
 3. Run `notebooks/02_preprocessing.ipynb` → `data/interim/emscad_clean.csv` and `data/processed/{train,val,test}.csv`.
-4. Run the tests: `pytest tests/`.
+4. Run `notebooks/03_baseline_model.ipynb` (or `python -m src.training.train_baseline`) → Week 3 baselines.
+5. Run `notebooks/04_red_flags_xgboost.ipynb` (or `python -m src.training.train_xgb`) → red-flag analysis and XGBoost comparison.
+6. Run the tests: `pytest tests/` (XGBoost tests are skipped if `xgboost` is not installed).
 
 ## 8. Models and large files
 Trained models are saved to `models/final/` and are **not** committed to Git. Final models will be published on
 Hugging Face Hub (link added here in Week 10).
 
 ## 9. Main results
-*Updated each week from `results/metrics/results.csv`.*
+All scores are on the **validation set** (2,379 postings, 107 fake). The test set is kept for the final comparison in Week 7.
 
-| Model | Split | Precision | Recall | F1 | PR-AUC |
+| Model | Threshold | Precision | Recall | F1 | PR-AUC |
 |---|---|---|---|---|---|
-| Always predict "real" (dummy) | val | 0.00 | 0.00 | 0.00 | – |
-| TF-IDF + Logistic Regression | val | Week 3 | | | |
+| Always predict "real" (dummy) | – | 0.000 | 0.000 | 0.000 | – |
+| TF-IDF + Naive Bayes | 0.50 | 0.579 | 0.822 | 0.680 | 0.806 |
+| TF-IDF + Naive Bayes | 0.962 (F1-best) | 0.876 | 0.729 | 0.796 | 0.806 |
+| TF-IDF + Logistic Regression | 0.50 | 0.696 | 0.813 | 0.750 | 0.841 |
+| **TF-IDF + Logistic Regression** | **0.738 (F1-best)** | **0.906** | **0.720** | **0.802** | **0.841** |
+| TF-IDF + XGBoost | Week 4 | | | | |
+| TF-IDF + red flags + XGBoost | Week 4 | | | | |
+
+Data after cleaning: 17,880 postings → 2,020 exact duplicates removed → 15,860 (713 fake, 4.5%); split 11,102 / 2,379 / 2,379.
+TF-IDF search (5-fold CV on train): 1–2-grams PR-AUC 0.870 vs 0.840 for single words.
 
 ## 10. Known limitations
 - EMSCAD postings are from 2012–2014; scam styles have changed (measured with the 2026 test set).
