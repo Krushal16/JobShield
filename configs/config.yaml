@@ -30,13 +30,64 @@ preprocessing:
 eda:
   min_group_size: 50       # minimum postings for a category to appear in fraud-rate charts
 
-# Week 3+ (baseline) – filled in when the experiment is run
-tfidf:
+# ---- Week 3: baseline models ----
+text_column: text_clean            # TF-IDF models use the cleaned text from src/features/text_cleaning.py
+
+tfidf:                             # 1-2-grams won the Week 3 CV search (PR-AUC 0.870 vs 0.840 for unigrams)
   ngram_range: [1, 2]
   min_df: 2
+  max_df: 0.95
   max_features: 50000
+  sublinear_tf: true
+
+tfidf_grid:                        # 5-fold stratified CV on the TRAINING set only
+  ngram_range: [[1, 1], [1, 2]]
+  min_df: [2, 5]
+  max_features: [20000, 50000, null]
 
 logistic_regression:
   class_weight: balanced
   C: 1.0
-  max_iter: 1000
+  max_iter: 2000
+
+naive_bayes:
+  alpha: 0.1
+  balanced_sample_weight: true
+
+cv_folds: 5
+cv_scoring: average_precision      # PR-AUC – suited to the 4.5% fake share
+
+threshold:
+  default: 0.5                     # we also report the F1-best threshold found on validation
+
+# ---- Week 4: red-flag features + XGBoost ----
+red_flags:
+  # each group is counted with whole-word, case-insensitive matching on the posting text
+  keywords:
+    payment_words: [fee, fees, deposit, cheque, check cashing, wire transfer, western union, money order,
+                    pay for training, training fee, starter kit, processing fee, upfront]
+    messaging_app: [whatsapp, telegram, signal app, wechat, skype, text us, text me, google hangouts]
+    easy_money_words: [earn, per week, weekly pay, no experience, work from home, extra income, easy money,
+                       be your own boss, unlimited income, quick money]
+    urgency_words: [immediately, urgent, urgently, asap, start today, limited positions, apply now, hiring now]
+    personal_info_request: [social security, ssn, sin number, bank account, bank details, routing number,
+                            credit card, date of birth, copy of your id, driver's license, drivers licence]
+    crypto_words: [bitcoin, crypto, cryptocurrency, usdt, btc, ethereum, wallet address]
+  scam_titles: [data entry, admin assistant, administrative assistant, customer service representative,
+                mystery shopper, payment processor, personal assistant, package handler, reshipper]
+  min_group_size: 30               # minimum postings with a flag before its fraud rate is reported
+
+xgboost:
+  n_estimators: 400
+  max_depth: 6
+  learning_rate: 0.1
+  subsample: 0.8
+  colsample_bytree: 0.5
+  min_child_weight: 1
+  scale_pos_weight: auto           # auto = number of real / number of fake postings in the training set
+  eval_metric: aucpr
+  tree_method: hist
+
+model_files:
+  baseline: models/final/baseline_tfidf_logreg.joblib
+  xgb: models/final/xgb_tfidf_redflags.joblib
