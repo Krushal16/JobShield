@@ -1,0 +1,19 @@
+flag,label,postings_with_flag,share_%,fraud_rate_with_%,fraud_rate_without_%,enough_data,lift
+scam_title,Job title often used in scams,195,1.76,32.31,4.0,True,8.08
+missing_company_profile,No company profile,2135,19.23,15.27,1.93,True,7.91
+no_company_logo,No company logo,2221,20.01,14.41,2.02,True,7.13
+easy_money_words,Easy-money / no-experience language,890,8.02,12.92,3.76,True,3.44
+n_phone_tokens,Contains phone numbers,559,5.04,12.34,4.08,True,3.02
+payment_words,"Mentions fees, deposits or cheques",330,2.97,10.3,4.32,True,2.38
+n_email_tokens,Contains e-mail addresses,798,7.19,9.4,4.11,True,2.29
+no_screening_questions,No screening questions,5640,50.8,6.03,2.91,True,2.07
+telecommuting,Remote / work-from-home job,472,4.25,8.9,4.3,True,2.07
+n_url_tokens,Contains links,3254,29.31,5.5,4.08,True,1.35
+missing_requirements,No requirements listed,1575,14.19,5.4,4.35,True,1.24
+missing_benefits,No benefits listed,4639,41.79,4.83,4.25,True,1.14
+personal_info_request,Asks for personal or bank details,239,2.15,4.18,4.5,True,0.93
+exclamation_count,exclamation_count,3494,31.47,4.15,4.65,True,0.89
+urgency_words,Urgent hiring language,1231,11.09,3.98,4.56,True,0.87
+missing_salary_range,No salary given,9242,83.25,4.07,6.61,True,0.62
+messaging_app,Asks to contact by messaging app,208,1.87,0.0,4.58,True,0.0
+crypto_words,Mentions cryptocurrency,9,0.08,0.0,4.5,False,0.0
