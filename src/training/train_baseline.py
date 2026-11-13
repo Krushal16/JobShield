@@ -64,15 +64,19 @@ def train_and_evaluate(train_df, val_df, cfg=None, log=True, verbose=True):
     return out
 
 
-def save_model(pipe, threshold, path=None, cfg=None, extra=None):
-    """Save the pipeline together with its decision threshold and basic metadata."""
+def save_model(pipe, threshold, path=None, cfg=None, kind="baseline", extra=None):
+    """Save the pipeline together with its decision threshold and basic metadata.
+
+    kind picks the default file from cfg["model_files"] ("baseline" or "xgb") when no path is given.
+    """
     cfg = cfg or load_config()
-    path = project_path(path or cfg["model_files"]["baseline"])
+    path = project_path(path or cfg["model_files"][kind])
     path.parent.mkdir(parents=True, exist_ok=True)
-    bundle = {"model": pipe, "threshold": float(threshold),
-              "metadata": {"trained": datetime.now().isoformat(timespec="minutes"),
-                           "text_column": cfg["text_column"], "tfidf": cfg["tfidf"],
-                           "logistic_regression": cfg["logistic_regression"], "seed": cfg["seed"], **(extra or {})}}
+    metadata = {"trained": datetime.now().isoformat(timespec="minutes"), "kind": kind,
+                "text_column": cfg["text_column"], "tfidf": cfg["tfidf"], "seed": cfg["seed"]}
+    if kind == "baseline":
+        metadata["logistic_regression"] = cfg["logistic_regression"]
+    bundle = {"model": pipe, "threshold": float(threshold), "metadata": {**metadata, **(extra or {})}}
     joblib.dump(bundle, path)
     return path
 
